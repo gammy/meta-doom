@@ -28,6 +28,10 @@ S = "${WORKDIR}/chocolate-doom-chocolate-doom-${PV}"
 do_install:append() {
 	install -d ${D}/${datadir}/games/doom
 	install -m 0644 ${WORKDIR}/DOOM1.WAD ${D}/${datadir}/games/doom/doom1.wad
+
+    install -d ${D}/home/weston/.local/share/chocolate-doom/
+    install -m 755 ${WORKDIR}/chocolate-doom.cfg ${D}/home/weston/.local/share/chocolate-doom/chocolate-doom.cfg
+    install -m 755 ${WORKDIR}/default.cfg ${D}/home/weston/.local/share/chocolate-doom/default.cfg
 }
 
 pkg_postinst_ontarget:${PN}() {
