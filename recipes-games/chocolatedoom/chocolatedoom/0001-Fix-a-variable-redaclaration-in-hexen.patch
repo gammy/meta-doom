@@ -1,0 +1,22 @@
+From 6388c1f749665f8031355fce0d9330bec8b125b0 Mon Sep 17 00:00:00 2001
+From: gammy <gammy@kristian-bullseye.ipec.co.uk>
+Date: Wed, 5 Apr 2023 21:17:13 +0100
+Subject: [PATCH] Fix a variable redaclaration in hexen
+
+---
+ src/hexen/mn_menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/hexen/mn_menu.c b/src/hexen/mn_menu.c
+index 3cb9274..14ec86b 100644
+--- a/src/hexen/mn_menu.c
++++ b/src/hexen/mn_menu.c
+@@ -130,7 +130,7 @@ boolean MenuActive;
+ int InfoType;
+ int messageson = true;
+ boolean mn_SuicideConsole;
+-boolean demoextend; // from h2def.h
++extern boolean demoextend; // from h2def.h
+ 
+ // PRIVATE DATA DEFINITIONS ------------------------------------------------
+ 

@@ -3,6 +3,24 @@ meta-doom layer.
 
 Please see the corresponding sections below for details.
 
+Gammies Fork
+==========================================
+This is gammies fork of geoffrey-vl's layer.
+
+Changes include:
+- Update the layer and recipes for Yocto Kirkstone
+- Update the version of chocolate-doom
+- Add recipe for libsdl2; there's one in poky, but if you're rolling your own
+  distro, you probably don't have it
+- Switch sdl-mixer and sdl2-net dependencies to their sdl2 equivalents, which
+  are already available in oe-core
+- Remove the dependency on the freescale layer; it's no longer needed
+  (and I'm not on freescale hardware)
+- Add shareware doom along with freedoom
+
+The last item in the list has been added directly to the freedoom
+recipe; arguably it should have its own recipe, shareare-doom or something,
+but I'm lazy.
 
 Dependencies
 ============

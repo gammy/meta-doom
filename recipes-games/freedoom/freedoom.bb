@@ -10,12 +10,18 @@ do_unpack[depends] += "unzip-native:do_populate_sysroot"
 
 PV = "0.11.3"
 
-SRC_URI = "https://github.com/freedoom/freedoom/releases/download/v${PV}/freedoom-${PV}.zip"
+SRC_URI = "https://github.com/freedoom/freedoom/releases/download/v${PV}/freedoom-${PV}.zip;name=engine \
+           http://www.doomworld.com/3ddownloads/ports/shareware_doom_iwad.zip;name=shareware"
 
+SRC_URI[engine.sha256sum] = "28a5eafbb1285b78937bd408fcdd8f25f915432340eee79da692eae83bce5e8a"
+SRC_URI[shareware.sha256sum] = "845f4f3a449343b068a4e178f9cb018cb1f5b7d5ef09db292864ed554f612276"
+
+SRC_URI[md5sum] = "55e9a2c7a24651d63654407d2cec26c2"
+SRC_URI[sha256sum] = "28a5eafbb1285b78937bd408fcdd8f25f915432340eee79da692eae83bce5e8a"
 
 PACKAGE_ARCH = "all"
-FILES_${PN} = "${datadir}/games/doom/*"
-FILES_${PN}-doc = "${datadir}/doc/freedoom/*"
+FILES:${PN} = "${datadir}/games/doom/*"
+FILES:${PN}-doc = "${datadir}/doc/freedoom/*"
 
 do_install() {
 	install -d ${D}/${datadir}/games/doom
@@ -23,7 +29,3 @@ do_install() {
 	install -m 0644 ${WORKDIR}/freedoom-${PV}/freedoom1.wad ${D}/${datadir}/games/doom/
 	install -m 0644 ${WORKDIR}/freedoom-${PV}/freedoom2.wad ${D}/${datadir}/games/doom/
 }
-
-
-SRC_URI[md5sum] = "55e9a2c7a24651d63654407d2cec26c2"
-SRC_URI[sha256sum] = "28a5eafbb1285b78937bd408fcdd8f25f915432340eee79da692eae83bce5e8a"
