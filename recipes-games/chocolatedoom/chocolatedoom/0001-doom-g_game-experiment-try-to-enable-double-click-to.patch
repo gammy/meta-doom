@@ -1,0 +1,31 @@
+From c890a15a8ac28ef03523338a2c0c384fbbdee5e1 Mon Sep 17 00:00:00 2001
+From: Kristian Gunstone <kristian.gunstone@ipec.co.uk>
+Date: Fri, 17 Nov 2023 23:19:04 +0000
+Subject: [PATCH] doom/g_game: experiment: try to enable double-click to USE.
+ It seems the original code requires a mouse-movement in order for the 'double
+ click to USE' option to work.
+
+---
+ src/doom/g_game.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/doom/g_game.c b/src/doom/g_game.c
+index abafecc..8fe5e56 100644
+--- a/src/doom/g_game.c
++++ b/src/doom/g_game.c
+@@ -483,6 +483,15 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
+ 
+     if (dclick_use)
+     {
++        // Double click (IPEC PDD modification)
++        dclicktime += ticdup;
++        if (dclicktime > 1 && dclicktime < 50)
++        {
++            cmd->buttons |= BT_USE;
++            dclicks = 0;
++        }
++
++
+         // forward double click
+         if (mousebuttons[mousebforward] != dclickstate && dclicktime > 1 ) 
+         { 

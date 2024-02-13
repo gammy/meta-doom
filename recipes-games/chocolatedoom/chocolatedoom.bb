@@ -12,6 +12,10 @@ PR = "r0"
 SRC_URI = "https://github.com/chocolate-doom/chocolate-doom/archive/chocolate-doom-${PV}.tar.gz;name=engine \
            http://www.doomworld.com/3ddownloads/ports/shareware_doom_iwad.zip;name=shareware \
            file://0001-Fix-a-variable-redaclaration-in-hexen.patch \
+           file://0001-SetSDLVideoDriver-list-detected-video-drivers.patch \
+           file://chocolate-doom.cfg \
+           file://default.cfg \
+           file://0001-Nonsense.patch \
            "
 
 SRC_URI[engine.sha256sum] = "a54383beef6a52babc5b00d58fcf53a454f012ced7b1936ba359b13f1f10ac66"
@@ -26,7 +30,14 @@ do_install:append() {
 	install -m 0644 ${WORKDIR}/DOOM1.WAD ${D}/${datadir}/games/doom/doom1.wad
 }
 
-FILES:${PN} = "\
+pkg_postinst_ontarget:${PN}() {
+    # XXX note: mpv recipe does this too
+    chown -R weston: /home/weston/
+}
+
+FILES:${PN} = "\ 
+  /home/weston/.local/share/chocolate-doom/chocolate-doom.cfg \
+  /home/weston/.local/share/chocolate-doom/default.cfg \
   ${datadir}/games/doom/doom1.wad \
   ${datadir}/applications/* \
   ${datadir}/icons/* \

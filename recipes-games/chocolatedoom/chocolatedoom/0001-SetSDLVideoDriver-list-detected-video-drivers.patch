@@ -1,0 +1,29 @@
+From d7b2c50aec66cd843f269e0732d38a4b91374706 Mon Sep 17 00:00:00 2001
+From: gammy <gammy@kristian-bullseye.ipec.co.uk>
+Date: Fri, 12 May 2023 13:58:38 +0100
+Subject: [PATCH] SetSDLVideoDriver:list detected video drivers
+
+---
+ src/i_video.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/i_video.c b/src/i_video.c
+index 9528141..af227f1 100644
+--- a/src/i_video.c
++++ b/src/i_video.c
+@@ -1064,6 +1064,15 @@ void I_CheckIsScreensaver(void)
+ 
+ static void SetSDLVideoDriver(void)
+ {
++    // Enumerate available video driver options (minor patch by gammy)
++    int numVideoDrivers = SDL_GetNumVideoDrivers();
++    printf("%s: %d video driver%s available:\n", __func__,
++           numVideoDrivers, numVideoDrivers == 1 ? "" : "s");
++    for(int i = 0; i < numVideoDrivers; i++)
++    {
++        printf("%s:    %d = %s\n", __func__, i, SDL_GetVideoDriver(i));
++    }
++
+     // Allow a default value for the SDL video driver to be specified
+     // in the configuration file.
+ 
