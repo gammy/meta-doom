@@ -1,6 +1,8 @@
 DESCRIPTION = "A Doom Clone based on SDL"
 SECTION = "games"
-DEPENDS = "virtual/libsdl2 libsdl2-mixer libsdl2-net pkgconfig"
+# Note: The `weston` user (and home) is created by `weston-init`, so we depend
+#       on it so we can `chown` our subdirectories.
+DEPENDS = "virtual/libsdl2 libsdl2-mixer libsdl2-net pkgconfig weston-init"
 LICENSE = "GPL"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
@@ -29,17 +31,18 @@ do_install:append() {
 	install -d ${D}/${datadir}/games/doom
 	install -m 0644 ${WORKDIR}/DOOM1.WAD ${D}/${datadir}/games/doom/doom1.wad
 
-    install -d ${D}/home/weston/.local/share/chocolate-doom/
-    install -m 755 ${WORKDIR}/chocolate-doom.cfg ${D}/home/weston/.local/share/chocolate-doom/chocolate-doom.cfg
-    install -m 755 ${WORKDIR}/default.cfg ${D}/home/weston/.local/share/chocolate-doom/default.cfg
+    install -o weston -g weston -d ${D}/home/weston/.local/share/chocolate-doom/
+
+    install -o weston -g weston -m 755 ${WORKDIR}/chocolate-doom.cfg ${D}/home/weston/.local/share/chocolate-doom/chocolate-doom.cfg
+    install -o weston -g weston -m 755 ${WORKDIR}/default.cfg ${D}/home/weston/.local/share/chocolate-doom/default.cfg
 }
 
-pkg_postinst_ontarget:${PN}() {
-    # XXX note: mpv recipe does this too
-    chown -R weston: /home/weston/
-}
-
+# It seems explicitly adding subdirectories retains ownership perms on the base
+# image, hence the individual additions here.
 FILES:${PN} = "\ 
+  /home/weston/.local/ \
+  /home/weston/.local/share/ \
+  /home/weston/.local/share/chocolate-doom/ \
   /home/weston/.local/share/chocolate-doom/chocolate-doom.cfg \
   /home/weston/.local/share/chocolate-doom/default.cfg \
   ${datadir}/games/doom/doom1.wad \
