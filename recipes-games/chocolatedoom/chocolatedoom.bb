@@ -3,7 +3,7 @@ SECTION = "games"
 # Note: The `weston` user (and home) is created by `weston-init`, so we depend
 #       on it so we can `chown` our subdirectories.
 DEPENDS = "virtual/libsdl2 libsdl2-mixer libsdl2-net pkgconfig weston-init"
-LICENSE = "GPL"
+LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 RRECOMMENDS_${PN} = "freedoom"
