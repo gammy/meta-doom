@@ -1,53 +1,70 @@
-DESCRIPTION = "A Doom Clone based on SDL"
+DESCRIPTION = "An SDL2-based engine for Doom, Doom II, Hexen, Heretic & Strife"
 SECTION = "games"
-# Note: The `weston` user (and home) is created by `weston-init`, so we depend
-#       on it so we can `chown` our subdirectories.
-DEPENDS = "virtual/libsdl2 libsdl2-mixer libsdl2-net pkgconfig weston-init"
 LICENSE = "GPL-2.0-or-later"
-LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
+LIC_FILES_CHKSUM = "file://COPYING.md;md5=60d644347832d2dd9534761f6919e2a6"
 
-RRECOMMENDS_${PN} = "freedoom"
+DEPENDS = "virtual/libsdl2 pkgconfig"
+DEPENDS += "${@bb.utils.contains_any('DISTRO_FEATURES', 'ipv4 ipv6', 'libsdl2-net', '', d)}"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'libsdl2-mixer', '', d)}"
 
-PV = "3.0.1"
+RRECOMMENDS:${PN} = "freedoom doom-episode-1"
+
+PV = "3.1.1"
 PR = "r0"
-# FIXME seems upstream should be: https://www.chocolate-doom.org/downloads/3.0.1/chocolate-doom-${PV}.tar.gz ? Same thing?
-SRC_URI = "https://github.com/chocolate-doom/chocolate-doom/archive/chocolate-doom-${PV}.tar.gz;name=engine \
-           http://www.doomworld.com/3ddownloads/ports/shareware_doom_iwad.zip;name=shareware \
-           file://0001-Fix-a-variable-redaclaration-in-hexen.patch \
-           file://0001-SetSDLVideoDriver-list-detected-video-drivers.patch \
-           file://chocolate-doom.cfg \
-           file://default.cfg \
-           file://0001-Nonsense.patch \
-           "
+SRC_URI = "\
+    https://github.com/chocolate-doom/chocolate-doom/archive/refs/tags/chocolate-doom-${PV}.tar.gz;name=engine \
+"
 
-SRC_URI[engine.sha256sum] = "a54383beef6a52babc5b00d58fcf53a454f012ced7b1936ba359b13f1f10ac66"
-SRC_URI[shareware.sha256sum] = "845f4f3a449343b068a4e178f9cb018cb1f5b7d5ef09db292864ed554f612276"
+# 3.1.1
+SRC_URI[engine.sha256sum] = "1edcc41254bdc194beb0d33e267fae306556c4d24110a1d3d3f865717f25da23"
 
 inherit autotools-brokensep gettext pkgconfig
 
 S = "${WORKDIR}/chocolate-doom-chocolate-doom-${PV}"
 
 do_install:append() {
-	install -d ${D}/${datadir}/games/doom
-	install -m 0644 ${WORKDIR}/DOOM1.WAD ${D}/${datadir}/games/doom/doom1.wad
 
-    install -o weston -g weston -d ${D}/home/weston/.local/share/chocolate-doom/
+    install -m 644 -d "${D}/${datadir}/games/chocolate-doom/"
+    install -m 644 "COPYING.md" "${D}/${datadir}/games/chocolate-doom/"
 
-    install -o weston -g weston -m 755 ${WORKDIR}/chocolate-doom.cfg ${D}/home/weston/.local/share/chocolate-doom/chocolate-doom.cfg
-    install -o weston -g weston -m 755 ${WORKDIR}/default.cfg ${D}/home/weston/.local/share/chocolate-doom/default.cfg
+    # Exclude superfluous 'default' install files.
+    # TODO: How can we provide a mechanism to enable bundling (or even
+    #       compiling/not compiling support for) hexen, heretic, strife &
+    #       the network daemon?
+    # Can we use PACKAGECONFIG for this? TBD.
+    for extra_bin in \
+        hexen hexen-setup \
+        heretic heretic-setup \
+        strife strife-setup \
+        server
+    do
+        rm "${D}/${bindir}/chocolate-${extra_bin}"
+    done
+
+    # Exclude bash completion scripts for the binaries, xml files containing
+    # nerd-info, screensavers (in applications/screensavers) and desktop icons.
+    # TODO: make these optional (enabled by default)
+    for share_subdir in bash-completion metainfo applications icons
+    do
+        rm -r "${D}/${datadir}/${share_subdir}"
+    done
 }
 
-# It seems explicitly adding subdirectories retains ownership perms on the base
-# image, hence the individual additions here.
-FILES:${PN} = "\ 
-  /home/weston/.local/ \
-  /home/weston/.local/share/ \
-  /home/weston/.local/share/chocolate-doom/ \
-  /home/weston/.local/share/chocolate-doom/chocolate-doom.cfg \
-  /home/weston/.local/share/chocolate-doom/default.cfg \
-  ${datadir}/games/doom/doom1.wad \
-  ${datadir}/applications/* \
-  ${datadir}/icons/* \
-  ${datadir}/appdata/* \
-  ${bindir}/* \
+FILES:${PN} = "\
+  ${bindir}/chocolate* \
+  ${datadir}/games/chocolate-doom/COPYING.md \
 "
+
+# A complete (proper) install should also bundle these:
+#  ${datadir}/bash-completion/*
+#  ${datadir}/metainfo/*
+#  ${datadir}/applications/*
+#  ${datadir}/icons/*
+#  ${datadir}/appdata/*
+
+# Yocto wants us to reformat the engine URL with `git://`.
+# But we're not pulling a git checkout from github; we're pulling an
+# archived tarball, which isn't related to git at all.
+# The QA Warning is thus nonsensical.
+# FIXME this doesnt' actually make the QA warning go away though. Why?
+INSANE_SKIP:${PN} += "src-uri-bad"
