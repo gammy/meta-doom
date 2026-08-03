@@ -7,12 +7,19 @@ DEPENDS = "virtual/libsdl2 pkgconfig"
 DEPENDS += "${@bb.utils.contains_any('DISTRO_FEATURES', 'ipv4 ipv6', 'libsdl2-net', '', d)}"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'libsdl2-mixer', '', d)}"
 
+# Note: The `weston` user (and home) is created by `weston-init`, so we on the
+#       PDD Pro depend on it so we can `chown` our subdirectories.
+# FIXME subject to change soon
+DEPENDS += " weston-init"
+
 RRECOMMENDS:${PN} = "freedoom doom-episode-1"
 
 PV = "3.1.1"
 PR = "r0"
 SRC_URI = "\
     https://github.com/chocolate-doom/chocolate-doom/archive/refs/tags/chocolate-doom-${PV}.tar.gz;name=engine \
+    file://chocolate-doom.cfg \
+    file://default.cfg \
 "
 
 # 3.1.1
@@ -48,11 +55,21 @@ do_install:append() {
     do
         rm -r "${D}/${datadir}/${share_subdir}"
     done
+
+    # Add our IPEC PDD Pro customisation configurations for our stock user
+    install -o weston -g weston -d ${D}/home/weston/.local/share/chocolate-doom/
+    install -o weston -g weston -m 755 ${WORKDIR}/chocolate-doom.cfg ${D}/home/weston/.local/share/chocolate-doom/chocolate-doom.cfg
+    install -o weston -g weston -m 755 ${WORKDIR}/default.cfg ${D}/home/weston/.local/share/chocolate-doom/default.cfg
 }
 
 FILES:${PN} = "\
   ${bindir}/chocolate* \
   ${datadir}/games/chocolate-doom/COPYING.md \
+  /home/weston/.local/ \
+  /home/weston/.local/share/ \
+  /home/weston/.local/share/chocolate-doom/ \
+  /home/weston/.local/share/chocolate-doom/chocolate-doom.cfg \
+  /home/weston/.local/share/chocolate-doom/default.cfg \
 "
 
 # A complete (proper) install should also bundle these:
