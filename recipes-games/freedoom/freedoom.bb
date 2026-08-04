@@ -17,7 +17,6 @@ SRC_URI[engine.sha256sum] = "28a5eafbb1285b78937bd408fcdd8f25f915432340eee79da69
 SRC_URI[md5sum] = "55e9a2c7a24651d63654407d2cec26c2"
 SRC_URI[sha256sum] = "28a5eafbb1285b78937bd408fcdd8f25f915432340eee79da692eae83bce5e8a"
 
-PACKAGE_ARCH = "all"
 FILES:${PN} = "${datadir}/games/doom/*"
 FILES:${PN}-doc = "${datadir}/doc/freedoom/*"
 
