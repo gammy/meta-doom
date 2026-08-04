@@ -1,0 +1,85 @@
+From 30ce5c95e414d4d105a419f23b0745bbe27c8e74 Mon Sep 17 00:00:00 2001
+From: Kristian Gunstone <kristian.gunstone@ipec.co.uk>
+Date: Tue, 4 Aug 2026 11:45:20 +0100
+Subject: [PATCH] Touch input modfications for the IPEC PDD Pro
+
+---
+ src/doom/g_game.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+
+diff --git a/src/doom/g_game.c b/src/doom/g_game.c
+index 78bce28..1577f1e 100644
+--- a/src/doom/g_game.c
++++ b/src/doom/g_game.c
+@@ -208,6 +208,15 @@ static boolean *mousebuttons = &mousearray[1];  // allow [-1]
+ int             mousex;
+ int             mousey;         
+ 
++static int      ipec_delta_tic;
++static int      ipec_touch_counter;
++static int      ipec_last_state_change;
++static int      ipec_single_touch_time;
++static boolean  ipec_single_touch_event;
++static int      ipec_double_touch_time;
++static boolean  ipec_double_touch_event;
++
++
+ static int      dclicktime;
+ static boolean  dclickstate;
+ static int      dclicks; 
+@@ -487,6 +496,55 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
+ 	|| joybuttons[joybfire]) 
+ 	cmd->buttons |= BT_ATTACK; 
+  
++    static int last_button_state;
++
++    if(mousebuttons[0] != last_button_state)
++    {
++        //fprintf(stderr, "CHANGE: %d -> %d\n", last_button_state, mousebuttons[0]);
++        ipec_delta_tic = gametic - ipec_last_state_change;
++        //if(ipec_delta_tic > 30 && mousebuttons[0])
++        if(ipec_delta_tic > 30)
++        {
++            //fprintf(stderr, "----------------\n");
++            //fprintf(stderr, "CLICK TIMEOUT timeout at %d\n", ipec_delta_tic);
++            ipec_touch_counter = 0;
++            ipec_last_state_change = gametic;
++        }
++        else
++        {
++
++            ipec_last_state_change = gametic;
++
++            int cmp = 0; // ipec_touch_counter == 1 ? 0 : 1;
++
++            if(mousebuttons[0] == cmp)
++            {
++                ipec_touch_counter++;
++
++                //fprintf(stderr, "Transitioned to RELEASED, touch count %d\n", ipec_touch_counter);
++
++                if(ipec_touch_counter == 1)
++                {
++                    ipec_single_touch_time = ipec_last_state_change;
++                    //ipec_double_touch_time = 0;
++                }
++
++                if(ipec_touch_counter == 2)
++                {
++                    ipec_touch_counter = 0;
++                    ipec_double_touch_time = gametic;
++                    ipec_delta_tic = ipec_double_touch_time - ipec_single_touch_time;
++                    //fprintf(stderr, "Double-click: delta time: %d\n", ipec_delta_tic);
++                    cmd->buttons |= BT_USE;
++                    ipec_single_touch_time = gametic;
++                    ipec_double_touch_time = gametic;
++                }
++            }
++        }
++    }
++
++    last_button_state = mousebuttons[0];
++
+     if (gamekeydown[key_use]
+      || joybuttons[joybuse]
+      || mousebuttons[mousebuse])

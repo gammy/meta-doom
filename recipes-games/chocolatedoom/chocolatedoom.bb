@@ -16,11 +16,11 @@ RRECOMMENDS:${PN} = "freedoom doom-episode-1"
 
 PV = "3.1.1"
 PR = "r0"
-SRC_URI = "\
-    https://github.com/chocolate-doom/chocolate-doom/archive/refs/tags/chocolate-doom-${PV}.tar.gz;name=engine \
-    file://chocolate-doom.cfg \
-    file://default.cfg \
-"
+SRC_URI = "https://github.com/chocolate-doom/chocolate-doom/archive/refs/tags/chocolate-doom-${PV}.tar.gz;name=engine \
+           file://chocolate-doom.cfg \
+           file://default.cfg \
+           file://0001-Touch-input-modfications-for-the-IPEC-PDD-Pro.patch \
+           "
 
 # 3.1.1
 SRC_URI[engine.sha256sum] = "1edcc41254bdc194beb0d33e267fae306556c4d24110a1d3d3f865717f25da23"
